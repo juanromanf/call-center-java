@@ -1,27 +1,80 @@
 package com.prototype.callcenter.model;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CallCenterDispatcher {
 	
-	private ConcurrentLinkedQueue<PhoneCall> callQueue = new ConcurrentLinkedQueue<>();
+	private static final Logger LOGGER = LoggerFactory.getLogger(CallCenterDispatcher.class);
 	
-	private List<Employee> employees = new ArrayList<>();
+	private CallsQueue<PhoneCall> incomingCalls;
 	
-	public CallCenterDispatcher() {
+	private List<Employee> employees;
+	
+	private ExecutorService executor;
+	
+	public CallCenterDispatcher(List<Employee> employees) {
 		
+		this.employees = employees; 
+		this.incomingCalls = new CallsQueue<>();
+		this.executor = Executors.newFixedThreadPool(employees.size());
 	}
 	
-	public void receiveCall(PhoneCall call) {
+	public boolean receiveCall(PhoneCall call) {
 		
-		callQueue.offer(call);
+		return incomingCalls.addCall(call);
 	}
 	
-	public void dispatchCall() {
+	public void startDispatcher() {
 		
+		LOGGER.debug("initializing calls dispatcher...");
 		
+		while (incomingCalls.hasAwaitingCalls()) {
+			
+			LOGGER.debug("finding available agent...");
+			
+			Employee agent = getAvailableAgent();
+			
+			if (agent != null) {
+				
+				PhoneCall call = incomingCalls.takeCall();
+				
+				LOGGER.debug("call [{}] taked by employee [{}]...", call.getIdentifier(), agent.getId());
+			}
+		}
+		
+		LOGGER.debug("no more awaiting calls... bye!");
+		
+		shutdown();
+	}
+	
+	public void dispatchCall(Employee agent, PhoneCall call) {
+		
+		call.setStatus(PhoneCallStatus.ATTENDED);
+		agent.assignCall(call);
+		
+		executor.submit(agent);		
+	}
+	
+	public Employee getAvailableAgent() {
+		
+		return employees.stream().filter(e -> e.isAvailable()).findAny().orElse(null);
+	}
+	
+	private void shutdown() {
+		
+		try {
+			executor.shutdown();
+			executor.awaitTermination(5, TimeUnit.SECONDS);
+			
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

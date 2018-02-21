@@ -2,9 +2,9 @@ package com.prototype.callcenter.model;
 
 public enum PhoneCallStatus {
 	
-	AWAITING,
+	NEW,
 	
-	TAKED,
+	AWAITING,
 	
 	ATTENDED,
 	

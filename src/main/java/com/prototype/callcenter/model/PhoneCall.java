@@ -8,10 +8,10 @@ public class PhoneCall {
 
 	private PhoneCallStatus status;
 
-	public PhoneCall(String identifier, int duration, PhoneCallStatus status) {
+	public PhoneCall(String identifier) {
 		this.identifier = identifier;
-		this.duration = duration;
-		this.status = status;
+		this.duration = 0;
+		this.status = PhoneCallStatus.NEW;
 	}
 
 	public String getIdentifier() {

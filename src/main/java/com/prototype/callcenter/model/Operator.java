@@ -2,8 +2,8 @@ package com.prototype.callcenter.model;
 
 public class Operator extends Employee {
 
-	public Operator() {
+	public Operator(String id) {
 
-		super(1);
+		super(id, 1);
 	}
 }

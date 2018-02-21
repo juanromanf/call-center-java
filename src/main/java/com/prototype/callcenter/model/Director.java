@@ -2,8 +2,8 @@ package com.prototype.callcenter.model;
 
 public class Director extends Employee {
 
-	public Director() {
+	public Director(String id) {
 		
-		super(3);
+		super(id, 3);
 	}
 }

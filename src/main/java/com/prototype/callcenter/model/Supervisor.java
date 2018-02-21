@@ -2,8 +2,8 @@ package com.prototype.callcenter.model;
 
 public class Supervisor extends Employee {
 
-	public Supervisor() {
+	public Supervisor(String id) {
 		
-		super(2);
+		super(id, 2);
 	}
 }
