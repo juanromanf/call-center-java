@@ -1,20 +1,30 @@
 package com.prototype.callcenter.model;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-public class Employee implements Runnable {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.prototype.callcenter.utils.RandomGeneratorUtil;
+
+public class Employee implements Callable<PhoneCall> {
+
+	protected Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	protected String id;
 
 	protected int level;
 
 	protected boolean available;
-	
+
 	protected PhoneCall call;
 
 	public Employee(String id, int level) {
 		this.id = id;
 		this.level = level;
+		this.available = true;
+		this.call = null;
 	}
 
 	public String getId() {
@@ -32,26 +42,49 @@ public class Employee implements Runnable {
 	public void setAvailable(boolean available) {
 		this.available = available;
 	}
-	
+
+	public PhoneCall getCall() {
+		return call;
+	}
+
 	public void assignCall(PhoneCall call) {
-		
+
 		this.call = call;
 		this.available = false;
 	}
 
 	@Override
-	public void run() {
-		
+	public String toString() {
+
+		return getClass().getSimpleName() + " [" + getId() + "]";
+	}
+
+	@Override
+	public PhoneCall call() throws Exception {
+
+		LOGGER.debug("{} take the call [{}]", toString(), getCall().getId());
+
 		try {
-			int duration = 10;
-			call.setDuration(duration);
-			
+			int duration = RandomGeneratorUtil.getRandomNumberInRange(5, 10);
+			getCall().setDuration(duration);
+
 			TimeUnit.SECONDS.sleep(duration);
 			
-			this.setAvailable(true);
-			
+			getCall().setStatus(PhoneCallStatus.FINISHED);
+
+			LOGGER.debug("{} attended the call [{}], total time [{} secs]", toString(), getCall().getId(),
+					getCall().getDuration());
+
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+
+			LOGGER.error("agent call lost!", e);
+
+		} finally {
+
+			setAvailable(true);
 		}
+		
+		return getCall();
 	}
+
 }

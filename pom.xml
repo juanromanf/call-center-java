@@ -7,26 +7,27 @@
 	<version>1.0.0</version>
 
 	<name>call-center</name>
-	<description>Almundo Java Coding Test</description>
+	<description>AlMundo Java Coding Test</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<slf4jVersion>1.6.1</slf4jVersion>
+		<logback.version>1.1.1</logback.version>
+		<slf4j.version>1.7.5</slf4j.version>
 	</properties>
 
 	<dependencies>
 
+		<!-- Logger -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>${slf4jVersion}</version>
+			<version>${slf4j.version}</version>
 		</dependency>
-
-		<!-- Binding for System.out -->
+		
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4jVersion}</version>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
 		</dependency>
 
 		<dependency>

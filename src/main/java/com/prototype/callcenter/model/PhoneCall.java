@@ -2,20 +2,20 @@ package com.prototype.callcenter.model;
 
 public class PhoneCall {
 
-	private String identifier;
+	private String id;
 
 	private int duration;
 
 	private PhoneCallStatus status;
 
-	public PhoneCall(String identifier) {
-		this.identifier = identifier;
+	public PhoneCall(String id) {
+		this.id = id;
 		this.duration = 0;
-		this.status = PhoneCallStatus.NEW;
+		this.status = PhoneCallStatus.AWAITING;
 	}
 
-	public String getIdentifier() {
-		return identifier;
+	public String getId() {
+		return id;
 	}
 
 	public int getDuration() {
@@ -24,10 +24,6 @@ public class PhoneCall {
 
 	public PhoneCallStatus getStatus() {
 		return status;
-	}
-
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
 	}
 
 	public void setDuration(int duration) {

@@ -8,69 +8,117 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The CallCenterDispatcher.
+ */
 public class CallCenterDispatcher {
 	
+	private static final int MAX_AGENT_LEVEL = 4;
+
+	/** The Constant LOGGER. */
 	private static final Logger LOGGER = LoggerFactory.getLogger(CallCenterDispatcher.class);
 	
+	/** The incoming calls. */
 	private CallsQueue<PhoneCall> incomingCalls;
 	
+	/** The employees. */
 	private List<Employee> employees;
 	
+	/** The executor. */
 	private ExecutorService executor;
 	
-	public CallCenterDispatcher(List<Employee> employees) {
+	/**
+	 * Instantiates a new call center dispatcher.
+	 *
+	 * @param employees the employees
+	 * @param capacity the maximum capacity for simultaneous calls.
+	 */
+	public CallCenterDispatcher(List<Employee> employees, int capacity) {
 		
 		this.employees = employees; 
 		this.incomingCalls = new CallsQueue<>();
-		this.executor = Executors.newFixedThreadPool(employees.size());
+		this.executor = Executors.newFixedThreadPool(capacity);
 	}
 	
+	/**
+	 * Receive call.
+	 *
+	 * @param call the call
+	 * @return true, if successful
+	 */
 	public boolean receiveCall(PhoneCall call) {
+		
+		LOGGER.debug("Incoming call [{}] queued...", call.getId());
 		
 		return incomingCalls.addCall(call);
 	}
 	
+	/**
+	 * Start dispatcher.
+	 */
 	public void startDispatcher() {
 		
-		LOGGER.debug("initializing calls dispatcher...");
+		LOGGER.debug("Initializing calls dispatcher...");
+		
+		int level = 1;
 		
 		while (incomingCalls.hasAwaitingCalls()) {
 			
-			LOGGER.debug("finding available agent...");
+			Employee agent = getAvailableAgent(level);
 			
-			Employee agent = getAvailableAgent();
-			
-			if (agent != null) {
+			if (agent == null) {
 				
-				PhoneCall call = incomingCalls.takeCall();
+				level = (level < MAX_AGENT_LEVEL) ? level + 1 : 1;
 				
-				LOGGER.debug("call [{}] taked by employee [{}]...", call.getIdentifier(), agent.getId());
+			} else {
+				
+				dispatchCall(agent, incomingCalls.takeCall());
 			}
 		}
 		
-		LOGGER.debug("no more awaiting calls... bye!");
+		stopDispatcher();
 		
-		shutdown();
+		LOGGER.debug("No more awaiting calls... Bye!");
 	}
 	
+	/**
+	 * Dispatch call.
+	 *
+	 * @param agent the agent
+	 * @param call the call
+	 */
 	public void dispatchCall(Employee agent, PhoneCall call) {
 		
-		call.setStatus(PhoneCallStatus.ATTENDED);
+		call.setStatus(PhoneCallStatus.TAKED);
 		agent.assignCall(call);
 		
-		executor.submit(agent);		
+		executor.submit(agent);
 	}
 	
-	public Employee getAvailableAgent() {
+	/**
+	 * Gets the available agent.
+	 *
+	 * @param level the level
+	 * @return the available agent
+	 */
+	public Employee getAvailableAgent(final int level) {
 		
-		return employees.stream().filter(e -> e.isAvailable()).findAny().orElse(null);
+		Employee employee = employees.stream()
+				.filter(e -> e.getLevel() == level)
+				.filter(e -> e.isAvailable())
+				.findAny().orElse(null);
+		
+		return employee;
 	}
 	
-	private void shutdown() {
+	/**
+	 * Shutdown dispatcher.
+	 */
+	public void stopDispatcher() {
 		
 		try {
 			executor.shutdown();
-			executor.awaitTermination(5, TimeUnit.SECONDS);
+			executor.awaitTermination(10, TimeUnit.SECONDS);
 			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
