@@ -31,10 +31,10 @@ public class CallCenterApp {
 		
 		for (int i = 1; i <= 20; i++) {
 			
-			dispatcher.receiveCall(new PhoneCall(String.format("%02d", i)));
+			dispatcher.dispatchCall(new PhoneCall(String.format("%02d", i)));
 		}
 		
-		dispatcher.startDispatcher();
+		dispatcher.waitForUnattendedCalls();
 	}
 
 }

@@ -15,11 +15,11 @@ public class CallCenterDispatcher {
 	
 	private static final int MAX_AGENT_LEVEL = 4;
 
-	/** The Constant LOGGER. */
+	/** The LOGGER. */
 	private static final Logger LOGGER = LoggerFactory.getLogger(CallCenterDispatcher.class);
 	
 	/** The incoming calls. */
-	private CallsQueue<PhoneCall> incomingCalls;
+	private CallsQueue<PhoneCall> incomingCallsQueue;
 	
 	/** The employees. */
 	private List<Employee> employees;
@@ -36,44 +36,59 @@ public class CallCenterDispatcher {
 	public CallCenterDispatcher(List<Employee> employees, int capacity) {
 		
 		this.employees = employees; 
-		this.incomingCalls = new CallsQueue<>();
+		this.incomingCallsQueue = new CallsQueue<>();
 		this.executor = Executors.newFixedThreadPool(capacity);
 	}
 	
 	/**
-	 * Receive call.
+	 * Dispatch call.
 	 *
 	 * @param call the call
-	 * @return true, if successful
 	 */
-	public boolean receiveCall(PhoneCall call) {
+	public void dispatchCall(PhoneCall call) {
 		
-		LOGGER.debug("Incoming call [{}] queued...", call.getId());
+		LOGGER.debug("Incoming call [{}]...", call.getId());
 		
-		return incomingCalls.addCall(call);
+		dispatchCall(call, 1);
 	}
 	
 	/**
-	 * Start dispatcher.
+	 * Dispatch call.
+	 *
+	 * @param call the call
+	 * @param level the level
 	 */
-	public void startDispatcher() {
+	public void dispatchCall(PhoneCall call, int level) {
 		
-		LOGGER.debug("Initializing calls dispatcher...");
+		Employee agent = getAvailableAgent(level);
 		
-		int level = 1;
-		
-		while (incomingCalls.hasAwaitingCalls()) {
+		if (agent == null) {
 			
-			Employee agent = getAvailableAgent(level);
-			
-			if (agent == null) {
-				
-				level = (level < MAX_AGENT_LEVEL) ? level + 1 : 1;
-				
-			} else {
-				
-				dispatchCall(agent, incomingCalls.takeCall());
+			if (level < MAX_AGENT_LEVEL) {
+
+				// try to reach next level agent
+				dispatchCall(call, level + 1);
 			}
+			else {
+				incomingCallsQueue.addCall(call);
+			}
+
+		} else {
+
+			assignCallToAgent(agent, call);
+		}
+	}
+	
+	/**
+	 * Wait for unattended calls.
+	 */
+	public void waitForUnattendedCalls() {
+		
+		LOGGER.debug("Waiting for all awaiting calls get attended...");
+		
+		while (incomingCallsQueue.hasAwaitingCalls()) {
+			
+			dispatchCall(incomingCallsQueue.takeCall(), 1);
 		}
 		
 		stopDispatcher();
@@ -82,12 +97,12 @@ public class CallCenterDispatcher {
 	}
 	
 	/**
-	 * Dispatch call.
+	 * Assign call to agent.
 	 *
 	 * @param agent the agent
 	 * @param call the call
 	 */
-	public void dispatchCall(Employee agent, PhoneCall call) {
+	public void assignCallToAgent(Employee agent, PhoneCall call) {
 		
 		call.setStatus(PhoneCallStatus.TAKED);
 		agent.assignCall(call);
