@@ -13,7 +13,7 @@ import com.prototype.callcenter.model.PhoneCall;
 import com.prototype.callcenter.model.PhoneCallStatus;
 
 /**
- * The Class CallCenterDispatcher.
+ * The Asynchronous CallCenter Dispatcher.
  */
 public class CallCenterDispatcher implements Runnable {
 
@@ -55,7 +55,9 @@ public class CallCenterDispatcher implements Runnable {
 		this.attendedCalls = 0;
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Take a call from the queue and dispatch to a free agent (Consumer).
+	 * 
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
@@ -96,10 +98,10 @@ public class CallCenterDispatcher implements Runnable {
 	}
 
 	/**
-	 * Dispatch call.
+	 * Dispatch a call to a free agent of the given level.
 	 *
 	 * @param call the call
-	 * @param level the level
+	 * @param level the level of the agent
 	 * @return the phone call status
 	 */
 	public PhoneCallStatus dispatchCall(PhoneCall call, int level) {
@@ -127,7 +129,9 @@ public class CallCenterDispatcher implements Runnable {
 	}
 	
 	/**
-	 * Gets the available agent.
+	 * Gets an available agent with the provided level (Operator=1, Supervisor=2, Director=3).
+	 * 
+	 * If there no available agent for the level, tries to find one recursively with the next level.
 	 *
 	 * @param level
 	 *            the level

@@ -11,7 +11,7 @@ import com.prototype.callcenter.model.Employee;
 import com.prototype.callcenter.model.PhoneCall;
 
 /**
- * The CallCenter Dispatcher.
+ * The CallCenter.
  */
 public class CallCenter {
 
@@ -31,12 +31,10 @@ public class CallCenter {
 	private ExecutorService executor;
 
 	/**
-	 * Instantiates a new call center dispatcher.
+	 * Instantiates a new call center.
 	 *
 	 * @param employees
 	 *            the employees
-	 * @param capacity
-	 *            the maximum capacity for simultaneous calls.
 	 */
 	public CallCenter(List<Employee> employees) {
 
@@ -56,16 +54,18 @@ public class CallCenter {
 	}
 
 	/**
-	 * Start dispatcher.
+	 * Start the asynchronous dispatcher.
 	 */
 	public void startDispatcher() {
+		
+		LOGGER.debug("Call center is open... Hi !");
 		
 		dispatcher = new CallCenterDispatcher(employees, incomingQueue);
 		executor.submit(dispatcher);
 	}
 	
 	/**
-	 * Receive call.
+	 * Receive call and put in the incoming queue (Producer)
 	 *
 	 * @param call the call
 	 */
@@ -76,7 +76,7 @@ public class CallCenter {
 
 
 	/**
-	 * Shutdown dispatcher.
+	 * Shutdown dispatcher and close call center.
 	 */
 	public void stopDispatcher() {
 		

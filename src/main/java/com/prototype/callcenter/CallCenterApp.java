@@ -11,8 +11,16 @@ import com.prototype.callcenter.model.Operator;
 import com.prototype.callcenter.model.PhoneCall;
 import com.prototype.callcenter.model.Supervisor;
 
+/**
+ * The CallCenter application main class.
+ */
 public class CallCenterApp {
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 
 		List<Employee> employees = new ArrayList<>();
