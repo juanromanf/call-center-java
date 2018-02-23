@@ -3,6 +3,8 @@ package com.prototype.callcenter.model;
 public class PhoneCall {
 
 	private String id;
+	
+	private int level;
 
 	private int duration;
 
@@ -16,6 +18,14 @@ public class PhoneCall {
 
 	public String getId() {
 		return id;
+	}
+	
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
 	}
 
 	public int getDuration() {
@@ -33,5 +43,13 @@ public class PhoneCall {
 	public void setStatus(PhoneCallStatus status) {
 		this.status = status;
 	}
+
+	@Override
+	public String toString() {
+		
+		return "PhoneCall [id=" + id + "]";
+	}
+	
+	
 
 }

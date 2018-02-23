@@ -55,14 +55,11 @@ public class Employee implements Callable<PhoneCall> {
 
 	@Override
 	public String toString() {
-
-		return getClass().getSimpleName() + " [" + getId() + "]";
+		return getClass().getSimpleName() + " [id=" + id + ", level=" + level + "]";
 	}
 
 	@Override
 	public PhoneCall call() throws Exception {
-
-		LOGGER.debug("{} take the call [{}]", toString(), getCall().getId());
 
 		try {
 			int duration = RandomGeneratorUtil.getRandomNumberInRange(5, 10);

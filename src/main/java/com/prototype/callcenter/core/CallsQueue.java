@@ -1,4 +1,4 @@
-package com.prototype.callcenter;
+package com.prototype.callcenter.core;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -7,8 +7,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @param <T> the generic type
  */
-public class CallsQueue<T> {
-
+public class CallsQueue<T>  {
+	
 	/** The call queue. */
 	private ConcurrentLinkedQueue<T> callQueue;
 
@@ -17,9 +17,9 @@ public class CallsQueue<T> {
 	 */
 	public CallsQueue() {
 		
-		 callQueue = new ConcurrentLinkedQueue<>();
+		callQueue = new ConcurrentLinkedQueue<>();
 	}
-
+	
 	/**
 	 * Gets the call queue.
 	 *
@@ -31,12 +31,12 @@ public class CallsQueue<T> {
 	}
 
 	/**
-	 * Adds the call.
+	 * Put call.
 	 *
 	 * @param call the call
-	 * @return 
+	 * @return true, if successful
 	 */
-	public boolean addCall(T call) {
+	public boolean putCall(T call) {
 
 		return callQueue.offer(call);
 	}
@@ -52,7 +52,17 @@ public class CallsQueue<T> {
 	}
 	
 	/**
-	 * Take call.
+	 * Next call.
+	 *
+	 * @return the t
+	 */
+	public T nextCall() {
+		
+		return callQueue.peek();
+	}
+	
+	/**
+	 * Take call from queue.
 	 *
 	 * @return the t
 	 */
